@@ -37,7 +37,7 @@ if (!window.VSC.Constants.DEFAULT_SETTINGS) {
     exclusiveKeys: false, // default: false
     audioBoolean: true, // default: true (enable audio controller support)
     startHidden: false, // default: false
-    controllerOpacity: 0.3, // default: 0.3
+    controllerOpacity: 0.6, // default: 0.6 for better contrast on video pages
     controllerButtonSize: 14,
     customCSS: '', // user's additional CSS injected alongside the built-in defaults
     keyBindings: PREDEFINED_ACTIONS.map((action) => ({
