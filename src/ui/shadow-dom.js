@@ -64,7 +64,7 @@ class ShadowDOMManager {
         border-radius: 6px;
         padding: 4px;
         /* Keep clear of the player's top edge and native controls. */
-        margin: 40px 10px 10px 15px;
+        margin: 60px 10px 10px 15px;
         cursor: default;
         z-index: 9999999;
         white-space: nowrap;
