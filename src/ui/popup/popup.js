@@ -1,3 +1,5 @@
+import { applyI18n, t } from '../i18n.js';
+
 // Message type constants
 const MessageTypes = {
   SET_SPEED: 'VSC_SET_SPEED',
@@ -7,6 +9,8 @@ const MessageTypes = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  applyI18n();
+
   // Load settings and initialize speed controls
   loadSettingsAndInitialize();
 
@@ -46,11 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
     disableBtn.classList.toggle('disabled', !enabled);
 
     // Update tooltip
-    disableBtn.title = enabled ? 'Disable Extension' : 'Enable Extension';
+    disableBtn.title = t(enabled ? 'disableExtension' : 'enableExtension');
   }
 
   function settingsSavedReloadMessage(enabled) {
-    setStatusMessage(`${enabled ? 'Enabled' : 'Disabled'}. Reload page.`);
+    setStatusMessage(t(enabled ? 'enabledReload' : 'disabledReload'));
   }
 
   function setStatusMessage(str) {
