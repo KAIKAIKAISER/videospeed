@@ -59,7 +59,7 @@ const MESSAGES = {
     customCssHelp:
       'Additional rules injected alongside the built-in defaults. Use to override positioning or add site-specific tweaks.',
     cssPlaceholder:
-      "/* Global override */\nvsc-controller { top: 50px !important; }\n\n/* Domain-specific */\n:root[style*='--vsc-domain: &quot;example.com&quot;'] vsc-controller {\n  display: none !important;\n}",
+      "/* Global override */\nvsc-controller { top: 50px !important; }\n\n/* Domain-specific */\n:root[style*='--vsc-domain: \"example.com\"'] vsc-controller {\n  display: none !important;\n}",
     localFilesToc: 'Local files / Incognito',
     disableSiteToc: 'Disable on a site',
     siteSpeedToc: 'Default speed per site',
@@ -215,7 +215,7 @@ const MESSAGES = {
     customCss: '自定义 CSS',
     customCssHelp: '与内置默认规则一起注入的附加规则，可用于调整位置或添加网站专属设置。',
     cssPlaceholder:
-      "/* 全局覆盖 */\nvsc-controller { top: 50px !important; }\n\n/* 针对特定域名 */\n:root[style*='--vsc-domain: &quot;example.com&quot;'] vsc-controller {\n  display: none !important;\n}",
+      "/* 全局覆盖 */\nvsc-controller { top: 50px !important; }\n\n/* 针对特定域名 */\n:root[style*='--vsc-domain: \"example.com\"'] vsc-controller {\n  display: none !important;\n}",
     localFilesToc: '本地文件 / 无痕模式',
     disableSiteToc: '禁用某个网站',
     siteSpeedToc: '按网站设置默认速度',
