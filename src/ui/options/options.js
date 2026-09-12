@@ -13,6 +13,7 @@ import '../../core/settings.js';
 
 // UI helpers
 import { createRow } from './row-renderer.js';
+import { applyI18n, t } from '../i18n.js';
 
 // Initialize global namespace for options page
 window.VSC = window.VSC || {};
@@ -88,33 +89,33 @@ function syncCSSScroll() {
 
 // Action labels — shared by predefined and custom shortcut rows
 const ACTION_OPTIONS = [
-  ['slower', 'Decrease speed'],
-  ['faster', 'Increase speed'],
-  ['rewind', 'Rewind'],
-  ['advance', 'Advance'],
-  ['reset', 'Reset speed'],
-  ['fast', 'Preferred speed'],
-  ['muted', 'Mute'],
-  ['softer', 'Decrease volume'],
-  ['louder', 'Increase volume'],
-  ['pause', 'Pause'],
-  ['mark', 'Set marker'],
-  ['jump', 'Jump to marker'],
-  ['display', 'Show/hide controller'],
+  ['slower', t('actionSlower')],
+  ['faster', t('actionFaster')],
+  ['rewind', t('actionRewind')],
+  ['advance', t('actionAdvance')],
+  ['reset', t('actionReset')],
+  ['fast', t('actionFast')],
+  ['muted', t('actionMuted')],
+  ['softer', t('actionSofter')],
+  ['louder', t('actionLouder')],
+  ['pause', t('actionPause')],
+  ['mark', t('actionMark')],
+  ['jump', t('actionJump')],
+  ['display', t('actionDisplay')],
 ];
 
 // Column spec for shortcut rows (used by createRow)
 const SHORTCUT_COLUMNS = [
   { key: 'action', type: 'select', className: 'customDo', options: ACTION_OPTIONS },
-  { key: 'keyInput', type: 'text', className: 'customKey', placeholder: 'press a key' },
-  { key: 'value', type: 'text', className: 'customValue', placeholder: 'value (0.10)' },
+  { key: 'keyInput', type: 'text', className: 'customKey', placeholder: t('pressKey') },
+  { key: 'value', type: 'text', className: 'customValue', placeholder: t('valuePlaceholder') },
 ];
 
 // Column spec for site rule rows
 const SITE_RULE_COLUMNS = [
-  { key: 'pattern', type: 'text', className: 'rulePattern', placeholder: 'youtube.com or /regex/' },
+  { key: 'pattern', type: 'text', className: 'rulePattern', placeholder: t('sitePatternPlaceholder') },
   { key: 'disabled', type: 'checkbox', className: 'ruleDisabled', default: false },
-  { key: 'speed', type: 'text', className: 'ruleSpeed', placeholder: '(global)' },
+  { key: 'speed', type: 'text', className: 'ruleSpeed', placeholder: t('globalSpeedPlaceholder') },
 ];
 
 /**
@@ -202,7 +203,7 @@ function validateControllerCSS(css) {
     if (count === 0) {
       textarea.classList.add('css-warn');
       msg.classList.add('warn');
-      msg.textContent = 'No CSS rules parsed — check for syntax errors.';
+      msg.textContent = t('noCssRules');
       return true;
     }
 
@@ -211,11 +212,14 @@ function validateControllerCSS(css) {
     if (dropped.length > 0) {
       textarea.classList.add('css-warn');
       msg.classList.add('warn');
-      msg.textContent = `${count} rule${
-        count !== 1 ? 's' : ''
-      } parsed, ${dropped.length} dropped: ${dropped
-        .map((r) => `"${r.slice(0, 40)}${r.length > 40 ? '...' : ''}"`)
-        .join(', ')}`;
+      msg.textContent = t('ruleParsed', {
+        count,
+        plural: count !== 1 ? 's' : '',
+        dropped: dropped.length,
+        rules: dropped
+          .map((r) => `"${r.slice(0, 40)}${r.length > 40 ? '...' : ''}"`)
+          .join(', '),
+      });
       return true;
     }
 
@@ -223,7 +227,9 @@ function validateControllerCSS(css) {
   } catch (e) {
     textarea.classList.add('css-error');
     msg.classList.add('error');
-    msg.textContent = `Syntax error: ${e.message.replace(/^Failed to execute.*: /, '')}`;
+    msg.textContent = t('syntaxError', {
+      message: e.message.replace(/^Failed to execute.*: /, ''),
+    });
     return false;
   }
 }
@@ -315,21 +321,21 @@ let layoutMap = null;
  */
 function formatShortcutDisplay(displayKey, modifiers) {
   if (!displayKey) {
-    return 'null';
+    return t('keyNull');
   }
   const parts = [];
   if (modifiers) {
     if (modifiers.ctrl) {
-      parts.push('Ctrl');
+      parts.push(t('ctrl'));
     }
     if (modifiers.alt) {
-      parts.push('Alt');
+      parts.push(t('alt'));
     }
     if (modifiers.shift) {
-      parts.push('Shift');
+      parts.push(t('shift'));
     }
     if (modifiers.meta) {
-      parts.push('Meta');
+      parts.push(t('meta'));
     }
   }
   // Capitalize single-character keys for display
@@ -398,7 +404,7 @@ function recordKeyPress(e) {
     e.stopPropagation();
     return;
   } else if (e.code === 'Escape') {
-    e.target.value = 'null';
+    e.target.value = t('keyNull');
     e.target.code = null;
     e.target.keyCode = null;
     e.target.displayKey = null;
@@ -450,10 +456,10 @@ function recordKeyPress(e) {
   if (e.ctrlKey && e.altKey) {
     showWarning(
       e.target,
-      'This combination may conflict with AltGr input on some keyboard layouts.'
+      t('altGrWarning')
     );
   } else if (e.metaKey) {
-    showWarning(e.target, 'Some Cmd/Meta combinations are intercepted by the OS and may not work.');
+    showWarning(e.target, t('metaWarning'));
   }
 
   e.preventDefault();
@@ -496,7 +502,7 @@ function inputBlur(e) {
       e.target.modifiers
     );
   } else if (e.target.code === null) {
-    e.target.value = 'null';
+    e.target.value = t('keyNull');
   } else {
     // Legacy fallback
     const kc = e.target.keyCode;
@@ -673,7 +679,7 @@ function validate() {
         }
         new RegExp(regex, flags);
       } catch {
-        status.textContent = `Error: Invalid site rule regex: "${rule.pattern}". Unable to save.`;
+        status.textContent = t('invalidRegex', { pattern: rule.pattern });
         status.classList.add('show', 'error');
         valid = false;
         window.validationTimeout = setTimeout(() => {
@@ -690,9 +696,11 @@ function validate() {
         rule.speed < window.VSC.Constants.SPEED_LIMITS.MIN ||
         rule.speed > window.VSC.Constants.SPEED_LIMITS.MAX
       ) {
-        status.textContent = `Error: Speed for "${rule.pattern}" must be between ${
-          window.VSC.Constants.SPEED_LIMITS.MIN
-        } and ${window.VSC.Constants.SPEED_LIMITS.MAX}.`;
+        status.textContent = t('speedRange', {
+          pattern: rule.pattern,
+          min: window.VSC.Constants.SPEED_LIMITS.MIN,
+          max: window.VSC.Constants.SPEED_LIMITS.MAX,
+        });
         status.classList.add('show', 'error');
         valid = false;
         window.validationTimeout = setTimeout(() => {
@@ -733,7 +741,7 @@ async function save_options() {
 
     // Validate CSS syntax — block save on parse error
     if (!validateControllerCSS(customCSS)) {
-      status.textContent = 'Error: Controller CSS has syntax errors. Fix them before saving.';
+      status.textContent = t('cssSyntaxError');
       status.classList.add('show', 'error');
       setTimeout(() => {
         status.textContent = '';
@@ -745,7 +753,7 @@ async function save_options() {
     // Byte-length guard for chrome.storage.sync (8KB per-item limit)
     const cssByteSize = new Blob([customCSS]).size;
     if (cssByteSize > 8192) {
-      status.textContent = `Error: Controller CSS exceeds 8KB storage limit (${Math.round(cssByteSize / 1024)}KB). Reduce CSS size.`;
+      status.textContent = t('cssTooLarge', { size: Math.round(cssByteSize / 1024) });
       status.classList.add('show', 'error');
       setTimeout(() => {
         status.textContent = '';
@@ -777,7 +785,7 @@ async function save_options() {
     const ok = await window.VSC.videoSpeedConfig.save(settingsToSave);
 
     if (!ok) {
-      status.textContent = 'Error: failed to save options to storage';
+      status.textContent = t('saveFailed');
       status.classList.add('show', 'error');
       setTimeout(() => {
         status.textContent = '';
@@ -786,7 +794,7 @@ async function save_options() {
     }
   } catch (error) {
     console.error('Failed to save options:', error);
-    status.textContent = `Error saving options: ${error.message}`;
+    status.textContent = t('savingFailed', { message: error.message });
     status.classList.add('show', 'error');
     setTimeout(() => {
       status.textContent = '';
@@ -842,7 +850,7 @@ async function restore_options() {
     }
   } catch (error) {
     console.error('Failed to restore options:', error);
-    document.getElementById('status').textContent = `Error loading options: ${error.message}`;
+    document.getElementById('status').textContent = t('loadingFailed', { message: error.message });
     document.getElementById('status').classList.add('show', 'error');
     setTimeout(() => {
       document.getElementById('status').textContent = '';
@@ -854,7 +862,7 @@ async function restore_options() {
 async function restore_defaults() {
   try {
     const status = document.getElementById('status');
-    status.textContent = 'Restoring defaults...';
+    status.textContent = t('restoringDefaults');
     status.classList.remove('success', 'error');
     status.classList.add('show');
 
@@ -875,7 +883,7 @@ async function restore_defaults() {
     // Reload the options page (clears and re-renders all shortcut rows)
     await restore_options();
 
-    status.textContent = 'Default options restored';
+    status.textContent = t('defaultsRestored');
     status.classList.add('success');
     setTimeout(() => {
       status.textContent = '';
@@ -883,7 +891,7 @@ async function restore_defaults() {
     }, 2000);
   } catch (error) {
     console.error('Failed to restore defaults:', error);
-    status.textContent = `Error restoring defaults: ${error.message}`;
+    status.textContent = t('restoreFailed', { message: error.message });
     status.classList.add('show', 'error');
     setTimeout(() => {
       status.textContent = '';
@@ -915,7 +923,7 @@ async function export_settings() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    status.textContent = 'Settings exported';
+    status.textContent = t('settingsExported');
     status.classList.remove('error');
     status.classList.add('show', 'success');
     setTimeout(() => {
@@ -924,7 +932,7 @@ async function export_settings() {
     }, 2000);
   } catch (error) {
     console.error('Failed to export settings:', error);
-    status.textContent = `Error exporting settings: ${error.message}`;
+    status.textContent = t('exportFailed', { message: error.message });
     status.classList.add('show', 'error');
     setTimeout(() => {
       status.textContent = '';
@@ -956,11 +964,11 @@ async function handleImportFile(event) {
     try {
       imported = JSON.parse(text);
     } catch (e) {
-      throw new Error('File is not valid JSON', { cause: e });
+      throw new Error(t('invalidJson'), { cause: e });
     }
 
     if (!imported || typeof imported !== 'object' || !Array.isArray(imported.keyBindings)) {
-      throw new Error('File does not look like a Video Speed Controller settings file');
+      throw new Error(t('invalidSettingsFile'));
     }
 
     // Ensure config is initialized
@@ -972,7 +980,7 @@ async function handleImportFile(event) {
     await window.VSC.StorageManager.clear();
     const ok = await window.VSC.videoSpeedConfig.save(imported);
     if (!ok) {
-      throw new Error('Failed to write imported settings to storage');
+      throw new Error(t('importWriteFailed'));
     }
 
     // Remove custom shortcut rows before reloading UI
@@ -983,7 +991,7 @@ async function handleImportFile(event) {
     // Reload settings into the UI
     await restore_options();
 
-    status.textContent = 'Settings imported successfully';
+    status.textContent = t('settingsImported');
     status.classList.remove('error');
     status.classList.add('show', 'success');
     setTimeout(() => {
@@ -992,7 +1000,7 @@ async function handleImportFile(event) {
     }, 2000);
   } catch (error) {
     console.error('Failed to import settings:', error);
-    status.textContent = `Import failed: ${error.message}`;
+    status.textContent = t('importFailed', { message: error.message });
     status.classList.add('show', 'error');
     setTimeout(() => {
       status.textContent = '';
@@ -1009,6 +1017,8 @@ function switchTab(tabName) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  applyI18n();
+
   // Optional: Set up storage error monitoring for debugging/telemetry
   window.VSC.StorageManager.onError((error, data) => {
     // Log to console for debugging, could also send telemetry
