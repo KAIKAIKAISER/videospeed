@@ -12,7 +12,7 @@ class ShadowDOMManager {
    * @returns {ShadowRoot} Created shadow root
    */
   static createShadowDOM(wrapper, options = {}) {
-    const { top = '0px', left = '0px', speed = '1.00', opacity = 0.3, buttonSize = 14 } = options;
+    const { top = '0px', left = '0px', speed = '1.00', opacity = 0.6, buttonSize = 14 } = options;
 
     const shadow = wrapper.attachShadow({ mode: 'open' });
 
@@ -60,16 +60,18 @@ class ShadowDOMManager {
         left: 0;
         background: black;
         color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
         border-radius: 6px;
         padding: 4px;
-        margin: 10px 10px 10px 15px;
+        /* Keep clear of the player's top edge and native controls. */
+        margin: 40px 10px 10px 15px;
         cursor: default;
         z-index: 9999999;
         white-space: nowrap;
       }
       
       #controller:hover {
-        opacity: 0.7;
+        opacity: 0.85;
       }
       
       #controller:hover>.draggable {
@@ -83,7 +85,7 @@ class ShadowDOMManager {
       
       #controller.dragging {
         cursor: -webkit-grabbing;
-        opacity: 0.7;
+        opacity: 0.85;
       }
       
       #controller.dragging #controls {
@@ -101,6 +103,7 @@ class ShadowDOMManager {
         vertical-align: middle;
         box-sizing: border-box;
         touch-action: none;
+        font-weight: 600;
       }
       
       .draggable:active {
